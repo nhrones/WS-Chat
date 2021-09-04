@@ -1,6 +1,14 @@
 
+/** WebSocket Client */
+type Client = {
+    id: string
+    name: string
+    isAlive: boolean
+    socket: WebSocket
+}
+
 /** connected socket clients mapped by unique id */
-const webSockets = new Map<string, WebSocket>();
+const webSockets = new Map<string, Client>();
 
 /** load an index.html file (clients) */
 async function handleStaticFile() {
@@ -29,36 +37,41 @@ async function handleConnection(conn: Deno.Conn) {
     for await (const { request, respondWith } of httpConn) {
         if (request.headers.get("upgrade") === "websocket") {
             const { socket, response } = Deno.upgradeWebSocket(request);
-            let id = "" // the unique socket id 
-            let name = "" // id above allows for duplicate names
+            const client: Client = { id: '', name: '', isAlive: true, socket: socket }
+
             socket.onopen = () => {
-                id = request.headers.get('sec-websocket-key') || ""
-                console.log("User connected ... id=" + id);
+                client.id = request.headers.get('sec-websocket-key') || ""
+                console.log("User connected ... id=" + client.id);
                 // Register our new connection(user)
-                webSockets.set(id, socket)
+                webSockets.set(client.id, client)
             }
             socket.onmessage = (msg) => {
-                let data = msg.data
+                const data = msg.data
                 if (typeof data === 'string') {
                     // user registration request?
                     if (data.startsWith('Register')) {
                         // get the users name
-                        name = data.split(" ")[1]
-                        data = `has joined the chat!`
+                        client.name = data.split(" ")[1]
+                        broadcast(`${client.name} >> has joined the chat!`);
+                    } else if (data === 'pong') {
+                        client.isAlive = true
+                    } else { // relay messages
+                        broadcast(`${client.name} >> ${data}`);
                     }
                 }
-                broadcast(`${name} >> ${data}`);
             }
+            
             socket.onclose = () => {
-                webSockets.delete(id);
-                broadcast(`${name} has disconnected`)
-                console.log(name + " disconnected from chat ...");
+                webSockets.delete(client.id);
+                broadcast(`${client.name} has disconnected`)
+                console.log(client.name + " disconnected from chat ...");
             }
             socket.onerror = (err: Event | ErrorEvent) => {
                 console.log(err instanceof ErrorEvent ? err.message : err.type);
             }
             respondWith(response);
-
+            // heatbeat
+            setInterval(() => ping(), 10000);
         } else { // not a webSocket request just load our html
             respondWith(await handleStaticFile())
         }
@@ -66,8 +79,16 @@ async function handleConnection(conn: Deno.Conn) {
 }
 
 /** broadcast a message to every registered user */
-export function broadcast(msg: string): void {
-    for (const socket of webSockets.values()) {
-        socket.send(msg)
+function broadcast(msg: string): void {
+    for (const client of webSockets.values()) {
+        client.socket.send(msg)
     }
 }
+
+function ping() {
+    for (const client of webSockets.values()) {
+      if (!client.isAlive) { client.socket.close(); return; }
+      client.isAlive = false;
+      client.socket.send('ping');
+    }
+  }

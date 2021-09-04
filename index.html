@@ -46,7 +46,14 @@
                     : `wss://${window.location.host}`
                 socket = new WebSocket(sockURL)
                 socket.onopen = () => handleConnected(socket)
-                socket.onmessage = (msg) => log(msg.data)
+                socket.onmessage = (msg) => {
+                    if(msg.data === 'ping') {
+                        console.log('ping')
+                        sendIt(socket, {value:'pong'})
+                        return
+                    }
+                    log(msg.data)
+                }
                 socket.onclose = () => log("Disconnected from server ...")
                 socket.onerror = (err) => log(e instanceof ErrorEvent ? err.message : err.type)
             } catch (err) {
