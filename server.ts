@@ -10,8 +10,8 @@ type Client = {
 /** connected socket clients mapped by unique id */
 const webSockets = new Map<string, Client>();
 const DEV = Deno.env.get("DEV");
-console.info(Deno.env.toObject())
-console.info(DEV)
+const DEBUG = Deno.env.get("DEBUG");
+
 
 /** load an index.html file (clients) */
 async function handleStaticFile() {
@@ -28,7 +28,7 @@ async function handleStaticFile() {
 }
 
 const listener = Deno.listen({ port: 8080 });
-console.log("listening on http://localhost:8080")
+if (DEBUG) console.log("listening on http://localhost:8080")
 
 for await (const conn of listener) {
     handleConnection(conn);
@@ -44,7 +44,7 @@ async function handleConnection(conn: Deno.Conn) {
 
             socket.onopen = () => {
                 client.id = request.headers.get('sec-websocket-key') || ""
-                console.log("User connected ... id=" + client.id);
+                if (DEV) console.log("User connected ... id=" + client.id);
                 // Register our new connection(user)
                 webSockets.set(client.id, client)
             }
