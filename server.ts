@@ -9,9 +9,11 @@ type Client = {
 
 /** connected socket clients mapped by unique id */
 const webSockets = new Map<string, Client>();
-const DEV = Deno.env.get("DEV");
-const DEBUG = Deno.env.get("DEBUG");
 
+/** Deploy Environment */
+const DEV: boolean = (Deno.env.get("DEV") =="true")
+const DEBUG = (Deno.env.get("DEBUG") =="true");
+console.log(`Env DEV:${DEV}, DEBUG${DEBUG}`)
 
 /** load an index.html file (clients) */
 async function handleStaticFile() {
