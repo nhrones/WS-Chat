@@ -13,7 +13,7 @@ const webSockets = new Map<string, Client>();
 /** Deploy Environment */
 const DEV: boolean = (Deno.env.get("DEV") =="true")
 const DEBUG = (Deno.env.get("DEBUG") =="true");
-console.log(`Env DEV:${DEV}, DEBUG${DEBUG}`)
+console.log(`Env DEV: ${DEV}, DEBUG: ${DEBUG}`)
 
 /** load an index.html file (clients) */
 async function handleStaticFile() {
