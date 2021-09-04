@@ -16,7 +16,7 @@
     <script>
         window.addEventListener('DOMContentLoaded', (e) => {
             let socket
-            var name = prompt("Please enter your name", "John Doe");
+            var name = prompt("Please enter your name", "John Doe") || 'Nunya Bidness';
             const msg = document.getElementById('msg')
             msg.addEventListener('change', (e) => {
                 sendIt(socket, msg)
@@ -36,7 +36,7 @@
                 log("Connected to server ...")
                 log(`Welcome ${name}!`)
                 // registers user on the server
-                ws.send(`Register ${name}`)
+                ws.send(`Register:${name}`)
                 document.title = name
             }
 

@@ -13,7 +13,7 @@ const webSockets = new Map<string, Client>();
 /** Deploy Environment */
 const DEV: boolean = (Deno.env.get("DEV") =="true")
 const DEBUG = (Deno.env.get("DEBUG") =="true");
-console.log(`Env DEV: ${DEV}, DEBUG: ${DEBUG}`)
+if (DEBUG) console.log(`Env DEV: ${DEV}, DEBUG: ${DEBUG}`)
 
 /** load an index.html file (clients) */
 async function handleStaticFile() {
@@ -56,7 +56,7 @@ async function handleConnection(conn: Deno.Conn) {
                     // user registration request?
                     if (data.startsWith('Register')) {
                         // get the users name
-                        client.name = data.split(" ")[1]
+                        client.name = data.split(":")[1]
                         if (DEBUG) console.log(`${client.name} >> has joined the chat!`)
                         broadcast(`${client.name} >> has joined the chat!`);
                     } else if (data === 'pong') {
@@ -70,7 +70,7 @@ async function handleConnection(conn: Deno.Conn) {
             socket.onclose = () => {
                 webSockets.delete(client.id);
                 broadcast(`${client.name} has disconnected`)
-                console.log(client.name + " disconnected from chat ...");
+                if (DEV) console.log(client.name + " disconnected from chat ...");
             }
             socket.onerror = (err: Event | ErrorEvent) => {
                 console.log(err instanceof ErrorEvent ? err.message : err.type);
