@@ -46,7 +46,7 @@ async function handleConnection(conn: Deno.Conn) {
 
             socket.onopen = () => {
                 client.id = request.headers.get('sec-websocket-key') || ""
-                if (DEV) console.log("User connected ... id=" + client.id);
+                if (DEV) console.log("User connected ... id: " + client.id);
                 // Register our new connection(user)
                 webSockets.set(client.id, client)
             }
