@@ -10,7 +10,7 @@ type Client = {
 /** connected socket clients mapped by unique id */
 const webSockets = new Map<string, Client>();
 const DEV = Deno.env.get("DEV");
-console.info(Deno.env)
+console.info(Deno.env.toObject())
 console.info(DEV)
 
 /** load an index.html file (clients) */
