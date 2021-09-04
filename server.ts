@@ -46,7 +46,7 @@ async function handleConnection(conn: Deno.Conn) {
 
             socket.onopen = () => {
                 client.id = request.headers.get('sec-websocket-key') || ""
-                if (DEV) console.log("User connected ... id: " + client.id);
+                if (DEV) console.log("Client connected ... id: " + client.id);
                 // Register our new connection(user)
                 webSockets.set(client.id, client)
             }
@@ -57,6 +57,7 @@ async function handleConnection(conn: Deno.Conn) {
                     if (data.startsWith('Register')) {
                         // get the users name
                         client.name = data.split(" ")[1]
+                        if (DEBUG) console.log(`${client.name} >> has joined the chat!`)
                         broadcast(`${client.name} >> has joined the chat!`);
                     } else if (data === 'pong') {
                         client.isAlive = true
