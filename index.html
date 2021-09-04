@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Suppress browser request for favicon.ico -->
+    <link rel="shortcut icon" type="image/x-icon" href="data:image/x-icon;,">
+    <title>Chat</title>
+</head>
+<body>
+    <h1>Chat</h1>
+    <input id="msg" type="text"></input>
+    <button id='send'>Send</button>
+    <pre id="logger"></pre>
+    <script>
+        window.addEventListener('DOMContentLoaded', (e) => {
+            let socket
+            var name = prompt("Please enter your name", "Me");
+            const msg = document.getElementById('msg')
+            msg.addEventListener('change', (e) => {
+                sendIt(socket, msg)
+            })
+            const sendBtn = document.getElementById('send')
+            sendBtn.addEventListener('click', (e) => {
+                sendIt(socket, msg)
+            }) 
+            const logger = document.getElementById('logger')
+            logger.textContent = ""
+            const log = (what) => {
+                logger.textContent += `
+    ${what}`
+            }
+
+            const handleConnected = (ws) => {
+                log("Connected to server ...")
+                log(`Welcome ${name}!`)
+                // registers user on the server
+                ws.send(`Register ${name}`)
+                document.title = name
+            }
+
+            try {
+                const sockURL = (window.location.protocol === 'http:') 
+                    ? `ws://${window.location.host}` 
+                    : `wss://${window.location.host}`
+                socket = new WebSocket(sockURL)
+                socket.onopen = () => handleConnected(socket)
+                socket.onmessage = (msg) => log(msg.data)
+                socket.onclose = () => log("Disconnected from server ...")
+                socket.onerror = (err) => log(e instanceof ErrorEvent ? err.message : err.type)
+            } catch (err) {
+                log("Failed to connect to server ... exiting")
+                log(err.message)
+            }
+        })
+        
+        function sendIt(ws, msg) {
+            if (msg.value.length > 0) {
+                ws.send(msg.value)
+                msg.value = ""
+            }
+        }     
+    </script>
+</body>
+</html>
