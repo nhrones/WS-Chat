@@ -8,8 +8,11 @@ type Client = {
 }
 //@ts-ignore ?
 const chatChannel = new BroadcastChannel("chat");
+// message from another isolate! tell all clients
 chatChannel.onmessage = (e: MessageEvent) => {
-    broadcast(e.data)
+    for (const client of webSockets.values()) {
+        client.socket.send(e.data)
+    }
 }
 
 /** connected socket clients mapped by unique id */
