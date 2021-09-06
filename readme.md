@@ -1,8 +1,9 @@
 ## Deno Deploy WebSocket Chat App
 
- * Native HTTP/WS
+ * Native HTTP/WS -> BroadcastChannel
  * Zero dependencies (zero imports)
  * Only two files (index.html, server.ts)
- * 167 total lines of code (commented)
+
+![Drag Racing](comms.jpg)
 
 ## run it  https://deploy-socket-chat.deno.dev/
