@@ -69,6 +69,7 @@ async function handleConnection(conn: Deno.Conn) {
                     } else if (data === 'pong') {
                         client.isAlive = true
                     } else {
+                        if (DEBUG) console.log(`${client.name} >> ${msg.data}`)
                         broadcast(`${client.name} >> ${msg.data}`);
                     }
                 }
