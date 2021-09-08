@@ -20,8 +20,8 @@ chatChannel.onmessage = (e: MessageEvent) => {
 const webSockets = new Map<string, Client>()
 
 /** Deploy Environment */
-const DEV: boolean = (Deno.env.get("DEV") == "true")
-const DEBUG = (Deno.env.get("DEBUG") == "true")
+const DEV: boolean = (Deno.env.get("DEV") === "true")
+const DEBUG = (Deno.env.get("DEBUG") === "true")
 const INTERVAL = parseInt(Deno.env.get("INTERVAL") || "30000")
 if (DEBUG) console.log(`Env DEV: ${DEV}, DEBUG: ${DEBUG} INTERVAL: ${INTERVAL}`)
 
