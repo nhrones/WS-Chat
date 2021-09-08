@@ -47,9 +47,10 @@
                 socket = new WebSocket(sockURL)
                 socket.onopen = () => handleConnected(socket)
                 socket.onmessage = (msg) => {
-                    if(msg.data === 'ping') {
-                        console.log('ping')
-                        sendIt(socket, {value:'pong'})
+                    // watchdog timer from host
+                    if(msg.data === 'OK?') {
+                        console.log('OK?')
+                        sendIt(socket, {value:'ACK'}) // say yes!
                         return
                     }
                     log(msg.data)

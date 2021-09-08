@@ -67,8 +67,8 @@ async function handleConnection(conn: Deno.Conn) {
                         client.name = data.split(":")[1]// the second value of split-array
                         if (DEBUG) console.log(`${client.name} >> has joined the chat!`)
                         broadcast(`${client.name} >> has joined the chat!`);
-                    } else if (data === 'pong') {
-                        if (DEBUG) console.log(`Recieved 'pong' from ${client.name}`)
+                    } else if (data === 'ACK') { // watchdog acknowledged
+                        if (DEBUG) console.log(`Recieved watchdog 'ACK' from ${client.name}`)
                         client.isAlive = true
                     } else {
                         if (DEBUG) console.log(`${client.name} >> ${msg.data}`)
@@ -89,8 +89,8 @@ async function handleConnection(conn: Deno.Conn) {
 
             respondWith(response);
 
-            // heatbeat
-            setInterval(() => ping(), INTERVAL)
+            // watchdog timer
+            setInterval(() => watchDog(), INTERVAL)
 
 
         } else { // not a webSocket request just load our html
@@ -107,10 +107,11 @@ function broadcast(msg: string): void {
     chatChannel.postMessage(msg)
 }
 
-function ping() {
+// 
+function watchDog() {
     for (const client of webSockets.values()) {
         if (!client.isAlive) { client.socket.close(); return; }
         client.isAlive = false;
-        client.socket.send('ping');
+        client.socket.send('OK?');
     }
 }
