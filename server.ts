@@ -6,9 +6,10 @@ type Client = {
     isAlive: boolean
     socket: WebSocket
 }
-//@ts-ignore ?
+// our inter-isolate message-bus
 const chatChannel = new BroadcastChannel("chat");
-// message from another isolate! tell all clients
+
+// message from another isolate! relay to all socket clients
 chatChannel.onmessage = (e: MessageEvent) => {
     for (const client of webSockets.values()) {
         client.socket.send(e.data)
@@ -54,7 +55,7 @@ async function handleConnection(conn: Deno.Conn) {
             const client: Client = { id: '', name: '', isAlive: true, socket: socket }
             socket.onopen = () => {
                 client.id = request.headers.get('sec-websocket-key') || ""
-                if (DEV) console.log("Client connected ... id: " + client.id)
+                if (DEBUG) console.log("Client connected ... id: " + client.id)
                 // Register our new socket(user)
                 webSockets.set(client.id, client)
             }
@@ -68,7 +69,7 @@ async function handleConnection(conn: Deno.Conn) {
                         if (DEBUG) console.log(`${client.name} >> has joined the chat!`)
                         broadcast(`${client.name} >> has joined the chat!`);
                     } else if (data === 'ACK') { // watchdog acknowledged
-                        if (DEBUG) console.log(`Recieved watchdog 'ACK' from ${client.name}`)
+                        if (DEV) console.log(`Recieved watchdog 'ACK' from ${client.name}`)
                         client.isAlive = true
                     } else {
                         if (DEBUG) console.log(`${client.name} >> ${msg.data}`)
@@ -80,7 +81,7 @@ async function handleConnection(conn: Deno.Conn) {
                 const name = webSockets.get(client.id)?.name || 'someone'
                 webSockets.delete(client.id);
                 broadcast(`${name} has disconnected`)
-                if (DEV) console.log(name + " disconnected from chat ...")
+                if (DEBUG) console.log(name + " disconnected from chat ...")
             }
 
             socket.onerror = (err: Event | ErrorEvent) => {
