@@ -68,6 +68,7 @@ async function handleConnection(conn: Deno.Conn) {
                         if (DEBUG) console.log(`${client.name} >> has joined the chat!`)
                         broadcast(`${client.name} >> has joined the chat!`);
                     } else if (data === 'pong') {
+                        if (DEBUG) console.log(`Recieved 'pong' from ${client.name}`)
                         client.isAlive = true
                     } else {
                         if (DEBUG) console.log(`${client.name} >> ${msg.data}`)
