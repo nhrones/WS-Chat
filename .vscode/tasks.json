@@ -22,7 +22,8 @@
                 "command": "deployctl",
                 "args": [
                     "run",
-                    "--watch", 
+                    "--watch",
+                    "--no-check", 
                     "${workspaceFolder}\\server.ts"
                 ]
             },
