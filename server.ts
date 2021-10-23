@@ -28,7 +28,6 @@ chatChannel.onmessage = (e: MessageEvent) => {
 const webSockets = new Map<string, Client>()
 
 /** Deploy Environment */
-
 const DEBUG = (env.get("DEBUG") === "true")
 
 /** load an index.html file (clients) */
