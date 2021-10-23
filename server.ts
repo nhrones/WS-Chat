@@ -4,9 +4,7 @@ const {
     readFile,
     upgradeWebSocket,
     env
-    //@ts-ignore ?
 } = Deno
-//@ts-ignore ?
 type Conn = Deno.Conn
 
 /** WebSocket Client */
@@ -52,7 +50,6 @@ async function handleStaticFile() {
 const listener = listen({ port: 8080 });
 console.log("listening on http://localhost:8080")
 
-//@ts-ignore
 for await (const conn of listener) {
     handleConnection(conn)
 }
@@ -60,7 +57,6 @@ for await (const conn of listener) {
 /** Handle each new connection */
 async function handleConnection(conn: Conn) {
     const httpConn = serveHttp(conn);
-    //for await (const { request, respondWith } of httpConn) {
     for await (const requestEvent of httpConn) {
         await requestEvent.respondWith(handleRequest(requestEvent.request));
     }
@@ -108,14 +104,7 @@ async function handleRequest(request: Request): Promise<Response> {
         }
 
         return response
-        //respondWith(response);
-
-        // watchdog timer
-        setInterval(() => watchDog(), INTERVAL)
-
-
     } else { // not a webSocket request just load our html
-        //respondWith(await handleStaticFile())
         return await handleStaticFile()
     }
 }
@@ -127,13 +116,4 @@ function broadcast(msg: string): void {
         client.socket.send(msg)
     }
     chatChannel.postMessage(msg)
-}
-
-// 
-function watchDog() {
-    for (const client of webSockets.values()) {
-        if (!client.isAlive) { client.socket.close(); return; }
-        client.isAlive = false;
-        client.socket.send('OK?');
-    }
 }

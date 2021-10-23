@@ -16,7 +16,7 @@
     <script>
         window.addEventListener('DOMContentLoaded', (e) => {
             let socket
-            var name = prompt("Please enter your name", "John Doe") || 'Jane Doe';
+            var name = prompt("Please enter your name", "Bill") || 'Jane';
             const msg = document.getElementById('msg')
             msg.addEventListener('change', (e) => {
                 sendIt(socket, msg)
