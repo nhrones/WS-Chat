@@ -28,10 +28,8 @@ chatChannel.onmessage = (e: MessageEvent) => {
 const webSockets = new Map<string, Client>()
 
 /** Deploy Environment */
-const DEV: boolean = (env.get("DEV") === "true")
+
 const DEBUG = (env.get("DEBUG") === "true")
-const INTERVAL = parseInt(env.get("INTERVAL") || "30000")
-if (DEBUG) console.log(`Env DEV: ${DEV}, DEBUG: ${DEBUG} INTERVAL: ${INTERVAL} DEPLOYMENT_ID: ${env.get("DENO_DEPLOYMENT_ID")}`)
 
 /** load an index.html file (clients) */
 async function handleStaticFile() {
@@ -84,7 +82,6 @@ async function handleRequest(request: Request): Promise<Response> {
                     if (DEBUG) console.log(`${client.name} >> has joined the chat!`)
                     broadcast(`${client.name} >> has joined the chat!`);
                 } else if (data === 'ACK') { // watchdog acknowledged
-                    if (DEV) console.log(`Recieved watchdog 'ACK' from ${client.name}`)
                     client.isAlive = true
                 } else {
                     if (DEBUG) console.log(`${client.name} >> ${msg.data}`)
